@@ -7,9 +7,9 @@ import sampleData from './sampleData.json';
 const TaskList:React.FC = () => {
   return (
     <div className={styles.root}>
-      {sampleData.map((task) => {
+      {sampleData.map((task) => (
         <TaskItem key={task.id} task={task}/>
-      })}
+      ))}
     </div>
   )
 }
