@@ -7,6 +7,30 @@
     & .text_field{
       width: 100%;
     }
+
+    & .button{
+      margin-top: 20px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      
+      &_submit{
+        background-color: orange;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 3px;
+      }
+
+      &_cancel{
+        background-color: gainsboro;
+        color: black;
+        border: none;
+        padding: 10px;
+        border-radius: 3px;
+      }
+    }
     
   }
 }
