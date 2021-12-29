@@ -1,0 +1,48 @@
+.root{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 5px;
+  background-color: bisque;
+  padding: 10px 20px;
+  margin-bottom: 10px;
+
+  & .title{
+    display: flex;
+    align-items: center;
+
+    &_text{
+      margin-left: 10px;
+    }
+  }
+
+  & .right_item{
+    display: flex;
+    align-items: center;
+
+    & .edit_btn{
+      border: none;
+      border-radius: 5px;
+      background-color: transparent;
+      cursor: pointer;
+      margin-right: 5px;
+
+      & .edit_icon{
+        width: 20px;
+        color: black;
+      }
+    }
+
+    & .delete_btn{
+      border: none;
+      border-radius: 5px;
+      background-color: transparent;
+      cursor: pointer;
+
+      & .delete_icon{
+        width: 20px;
+        color: black;
+      }
+    }
+  }
+}

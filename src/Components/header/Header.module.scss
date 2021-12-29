@@ -1,0 +1,17 @@
+.root{
+
+  & .app_bar{
+    box-shadow: none;
+    background-color: beige;
+    color: cadetblue;
+
+    & .tool_bars{
+      padding: 0px;
+
+      & .title{
+        font-size: 20px;
+      }
+    }
+  }
+
+}
