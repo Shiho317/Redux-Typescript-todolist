@@ -1,42 +1,70 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { act } from '@testing-library/react';
 import { RootState, AppThunk } from '../../app/store';
+import { db } from '../../firebase';
+import firebase from "firebase/compat/app";
 
 interface TaskState {
   idCount: number;
-  tasks: {id: number; title: string; completed:boolean}[];
-  selectedTask: {id: number; title: string; completed:boolean};
+  tasks: {id: string; title: string; completed:boolean}[];
+  selectedTask: {id: string; title: string; completed:boolean};
   isModalOpen: boolean;
 }
 
 const initialState: TaskState = {
   idCount: 1,
-  tasks: [{id: 1, title: 'Task A', completed: false}],
-  selectedTask: {id: 0, title: '', completed: false},
+  tasks: [],
+  selectedTask: {id: '', title: '', completed: false},
   isModalOpen: false,
 };
+
+export const fetchTasks = createAsyncThunk('task/getAllTasks', async() => {
+  const res = await db.collection('tasks').orderBy('dateTime', 'desc').get();
+
+  const allTasks = res.docs.map((doc) => ({
+    id: doc.id,
+    title: doc.data().title,
+    completed: doc.data().completed,
+  }));
+
+  const taskNumber = allTasks.length;
+  const passData = { allTasks, taskNumber };
+  return passData
+});
+
+export const createTask = async(title: string):Promise<void> => {
+  try{
+    const dateTime = firebase.firestore.Timestamp.fromDate(new Date());
+    await db.collection('tasks').add({title: title, completed: false, dateTime: dateTime})
+
+  }catch(err){
+    console.log('error')
+  }
+};
+
+export const editTask = async(submitData: {id: string; title: string; completed: boolean;}):Promise<void> => {
+  const {id, title, completed} = submitData;
+  const dateTime = firebase.firestore.Timestamp.fromDate(new Date());
+  try{
+    await db.collection('tasks').doc(id).set({title, completed, dateTime}, {merge: true});
+  }catch(err){
+    console.log('error')
+  }
+};
+
+export const deleteTask = async(id:string):Promise<void> => {
+  try{
+    await db.collection('tasks').doc(id).delete();
+  }catch(err){
+    console.log('error')
+  }
+}
 
 export const taskSlice = createSlice({
   name: 'task',
   initialState,
-  // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
-    createTask:(state, action) => {
-      state.idCount++;
-      const newTask = {
-        id: state.idCount,
-        title: action.payload,
-        completed: false,
-      };
-      state.tasks = [newTask, ...state.tasks];
-    },
-
-    editTask: (state, action) => {
-      const task = state.tasks.find((t) => t.id === action.payload.id);
-
-      if(task){
-        task.title = action.payload.title
-      }
-    },
+    
 
     selectTask: (state, action) => {
       state.selectedTask = action.payload;
@@ -45,21 +73,16 @@ export const taskSlice = createSlice({
     handleModalOpen: (state, action) => {
       state.isModalOpen = action.payload;
     },
-
-    completeTask: (state, action) => {
-      const task = state.tasks.find((t) => t.id === action.payload.id);
-      if(task){
-        task.completed = !task.completed;
-      };
-    },
-
-    deleteTask: (state, action) => {
-      state.tasks = state.tasks.filter((t) => t.id !== action.payload.id)
-    },
+  },
+  extraReducers:(builder) => {
+    builder.addCase(fetchTasks.fulfilled, (state, action) => {
+      state.tasks = action.payload.allTasks;
+      state.idCount = action.payload.taskNumber;
+    });
   },
 });
 
-export const { createTask, editTask, handleModalOpen, selectTask, completeTask, deleteTask } = taskSlice.actions;
+export const { handleModalOpen, selectTask } = taskSlice.actions;
 
 export const selectTasks = (state: RootState): TaskState['tasks'] => state.task.tasks;
 

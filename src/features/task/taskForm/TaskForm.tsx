@@ -4,7 +4,8 @@ import styles from './TaskForm.module.scss';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { useForm } from 'react-hook-form';
-import { createTask, editTask, handleModalOpen, selectSelectedTask } from '../taskSlice';
+import { createTask, editTask, fetchTasks, handleModalOpen, selectSelectedTask } from '../taskSlice';
+import { AppDispatch } from '../../../app/store';
 
 type Inputs = {
   taskTitle: string;
@@ -15,19 +16,21 @@ type PropTypes = {
 }
 
 const TaskForm: React.FC<PropTypes> = ({edit}) => {
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const selectedTask = useSelector(selectSelectedTask);
   const {register, handleSubmit, reset} = useForm();
 
-  const handleCreate = (data: Inputs) => {
-    dispatch(createTask(data.taskTitle));
+  const handleCreate = async (data: Inputs) => {
+    await createTask(data.taskTitle);
     reset();
+    dispatch(fetchTasks());
   };
 
-  const handleEdit = (data: Inputs) => {
+  const handleEdit = async (data: Inputs) => {
     const sendData = {...selectedTask, title: data.taskTitle};
-    dispatch(editTask(sendData));
+    await editTask(sendData);
     dispatch(handleModalOpen(false));
+    dispatch(fetchTasks());
   };
 
   return (

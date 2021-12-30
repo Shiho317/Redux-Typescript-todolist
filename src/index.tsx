@@ -5,10 +5,18 @@ import App from './App';
 import { store } from './app/store';
 import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
+import { Routes, Route, BrowserRouter } from 'react-router-dom';
+import UserAuth from './pages/userAuth/UserAuth';
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={App}/>
+          <Route path='/user-auth' element={UserAuth}/>
+        </Routes>
+      </BrowserRouter>
       <App />
     </Provider>
   </React.StrictMode>,

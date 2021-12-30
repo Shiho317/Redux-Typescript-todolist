@@ -1,4 +1,5 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
+import { TypeOfTag } from 'typescript';
 import counterReducer from '../features/counter/counterSlice';
 import taskReducer from '../features/task/taskSlice';
 

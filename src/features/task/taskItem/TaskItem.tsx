@@ -7,18 +7,19 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Modal from '@mui/material/Modal';
 import TaskForm from '../taskForm/TaskForm';
-import { selectTask, handleModalOpen, selectIsModalOpen, completeTask, deleteTask } from '../taskSlice';
+import { selectTask, handleModalOpen, selectIsModalOpen, deleteTask, editTask, fetchTasks } from '../taskSlice';
+import { AppDispatch } from '../../../app/store';
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 interface PropTypes {
-  task: {id: number, title: string, completed: boolean};
+  task: {id: string, title: string, completed: boolean};
 }
 
 const TaskItem: React.FC<PropTypes> = ({task}) => {
 
   const isModalOpen = useSelector(selectIsModalOpen);
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
   const handleOpen = () => {
     dispatch(selectTask(task));
@@ -26,6 +27,17 @@ const TaskItem: React.FC<PropTypes> = ({task}) => {
   };
 
   const handleClose = () => dispatch(handleModalOpen(false));
+
+  const handleEdit = async(id: string, title:string, completed: boolean) => {
+    const sendData = {id, title, completed: !completed};
+    await editTask(sendData);
+    dispatch(fetchTasks());
+  };
+
+  const handleDelete = async(id: string) => {
+    await deleteTask(id);
+    dispatch(fetchTasks());
+  }
 
   return (
     <div className={styles.root}>
@@ -35,12 +47,10 @@ const TaskItem: React.FC<PropTypes> = ({task}) => {
           {task.title}
         </div>
       </div>
-      <div className={styles.right_item}>
+      <div className={styles.right_item} >
         <Checkbox {...label} 
         checked={task.completed}
-        onClick={() => {
-        dispatch(completeTask(task))
-        }}
+        onClick={() => handleEdit(task.id, task.title, task.completed)}
         className={styles.checkBox}/>
 
         <button onClick={handleOpen}
@@ -49,7 +59,7 @@ const TaskItem: React.FC<PropTypes> = ({task}) => {
         </button>
 
         <button onClick={() => {
-          dispatch(deleteTask(task));
+          handleDelete(task.id);
         }}
         className={styles.delete_btn}>
           <DeleteIcon className={styles.delete_icon}/>
