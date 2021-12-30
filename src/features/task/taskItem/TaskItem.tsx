@@ -1,4 +1,5 @@
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styles from './TaskItem.module.scss';
 import Checkbox from '@mui/material/Checkbox';
 import EventNoteIcon from '@mui/icons-material/EventNote';
@@ -6,6 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Modal from '@mui/material/Modal';
 import TaskForm from '../taskForm/TaskForm';
+import { selectTask, handleModalOpen, selectIsModalOpen, completeTask, deleteTask } from '../taskSlice';
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
@@ -15,9 +17,15 @@ interface PropTypes {
 
 const TaskItem: React.FC<PropTypes> = ({task}) => {
 
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const isModalOpen = useSelector(selectIsModalOpen);
+  const dispatch = useDispatch();
+
+  const handleOpen = () => {
+    dispatch(selectTask(task));
+    dispatch(handleModalOpen(true));
+  };
+
+  const handleClose = () => dispatch(handleModalOpen(false));
 
   return (
     <div className={styles.root}>
@@ -31,7 +39,7 @@ const TaskItem: React.FC<PropTypes> = ({task}) => {
         <Checkbox {...label} 
         checked={task.completed}
         onClick={() => {
-        console.log(`check ${task.id}`)
+        dispatch(completeTask(task))
         }}
         className={styles.checkBox}/>
 
@@ -43,7 +51,7 @@ const TaskItem: React.FC<PropTypes> = ({task}) => {
         </button>
 
         <button onClick={() => {
-        console.log(`delete ${task.id}`)
+          dispatch(deleteTask(task));
         }}
         className={styles.delete_btn}>
           <DeleteIcon className={styles.delete_icon}/>
@@ -52,7 +60,7 @@ const TaskItem: React.FC<PropTypes> = ({task}) => {
       </div>
 
       <Modal
-        open={open}
+        open={isModalOpen}
         onClose={handleClose}
         className={styles.modal}>
         <div className={styles.modal_content}>
