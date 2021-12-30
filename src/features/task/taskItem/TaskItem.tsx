@@ -43,11 +43,9 @@ const TaskItem: React.FC<PropTypes> = ({task}) => {
         }}
         className={styles.checkBox}/>
 
-        <button onClick={() => {
-        console.log(`edit ${task.id}`)
-        }}
+        <button onClick={handleOpen}
         className={styles.edit_btn}>
-          <EditIcon className={styles.edit_icon} onClick={handleOpen}/>
+          <EditIcon className={styles.edit_icon}/>
         </button>
 
         <button onClick={() => {
